@@ -2,7 +2,7 @@ import pygame as pg
 import numpy as np
 from random import randint
 
-SCREEN_SIZE = (800, 600)
+SCREEN_SIZE = [800, 600]
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 WHITE = (245, 245, 245)
@@ -69,18 +69,19 @@ class Table:
         """
         self.count += points
 
-    #def count(self):
-        #self.bullet += 1
+    def shoot(self):
+        self.bullet += 1
 
     def draw(self):
         # Функция рисования самого счетчика
-        surface_counter = labelFont.render((str(self.count) + str('  ') +
-                                            str(self.bullet)), False, BLACK)
-        screen.blit(surface_counter, (0, 0))
+        pg.draw.rect(screen, BLACK, (0, 0, SCREEN_SIZE[0], SCREEN_SIZE[1]/5))
+        counter = labelFont.render((str(self.count) + str('  ') +
+                                    str(self.bullet)), False, WHITE)
+        screen.blit(counter, (0, 0))
 
 
 class Gun:
-    def __init__(self, coord=[30, SCREEN_SIZE[1] // 2],
+    def __init__(self, coord=[30, 3 * SCREEN_SIZE[1] // 5],
                  min_pow=20, max_pow=50):
         self.coord = coord
         self.angle = 0
@@ -113,8 +114,9 @@ class Gun:
 class Target:
     def __init__(self, min_rad=20, max_rad=50):
         self.rad = randint(min_rad, max_rad)
-        self.x = randint(SCREEN_SIZE[0] // 2, SCREEN_SIZE[0] - self.rad)
-        self.y = randint(self.rad, SCREEN_SIZE[1] - self.rad)
+        self.x = randint(2 * SCREEN_SIZE[0] // 3, SCREEN_SIZE[0] - self.rad)
+        self.y = randint(SCREEN_SIZE[1] // 5 + self.rad,
+                         SCREEN_SIZE[1] - self.rad)
         self.color = RED
         self.speed = 20
 
@@ -122,7 +124,7 @@ class Target:
         pg.draw.circle(screen, self.color, [self.x, self.y], self.rad)
 
     def move(self):
-        if self.rad < self.y < SCREEN_SIZE[1] - self.rad:
+        if SCREEN_SIZE[1]/5 + self.rad < self.y < SCREEN_SIZE[1] - self.rad:
             self.y += self.speed
         else:
             self.speed = - self.speed
@@ -138,8 +140,9 @@ class Target:
             pg.mixer.music.play(1)
             count.increase(1)
             self.rad = randint(min_rad, max_rad)
-            self.x = randint(SCREEN_SIZE[0] // 2, SCREEN_SIZE[0] - self.rad)
-            self.y = randint(self.rad, SCREEN_SIZE[1] - self.rad)
+            self.x = randint(2 * SCREEN_SIZE[0] // 3, SCREEN_SIZE[0] - self.rad)
+            self.y = randint(SCREEN_SIZE[1]//5 + self.rad,
+                             SCREEN_SIZE[1] - self.rad)
 
 
 class Manager:
@@ -199,6 +202,7 @@ class Manager:
             elif event.type == pg.MOUSEBUTTONUP:
                 if event.button == 1:
                     self.balls.append(self.gun.strike())
+                    self.table.shoot()
 
         if pg.mouse.get_focused():
             mouse_pos = pg.mouse.get_pos()
@@ -212,7 +216,7 @@ pg.draw.rect(screen, WHITE, (0, 0, SCREEN_SIZE[0], SCREEN_SIZE[1]))
 pg.display.set_caption("The gun of Khiryanov")
 clock = pg.time.Clock()
 score = Table()  # создание экземпляра счетчика
-labelFont = pg.font.SysFont('Comic Sans MS', 100)  # задание шрифта счетчика
+labelFont = pg.font.SysFont('Comic Sans MS', 50)  # задание шрифта счетчика
 
 mgr = Manager()
 
