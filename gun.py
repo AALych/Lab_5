@@ -75,9 +75,12 @@ class Table:
     def draw(self):
         # Функция рисования самого счетчика
         pg.draw.rect(screen, BLACK, (0, 0, SCREEN_SIZE[0], SCREEN_SIZE[1]/5))
-        counter = labelFont.render((str(self.count) + str('  ') +
-                                    str(self.bullet)), False, WHITE)
+        counter = labelFont.render(('Ваш счёт: ' + str(self.count)),
+                                   False, WHITE)
+        bullets = labelFont.render(('Количество пуль: ' + str(self.bullet)),
+                                   False, WHITE)
         screen.blit(counter, (0, 0))
+        screen.blit(bullets, (0, SCREEN_SIZE[1] // 13))
 
 
 class Gun:
@@ -93,7 +96,7 @@ class Gun:
     def draw(self, screen):
         end_pos = [int(self.coord[0] + self.power * np.cos(self.angle)),
                    int(self.coord[1] + self.power * np.sin(self.angle))]
-        pg.draw.line(screen, RED, self.coord, end_pos, 5)
+        pg.draw.line(screen, RED, self.coord, end_pos, 7)
 
     def strike(self):
         vel = [int(self.power * np.cos(self.angle)),
@@ -216,7 +219,8 @@ pg.draw.rect(screen, WHITE, (0, 0, SCREEN_SIZE[0], SCREEN_SIZE[1]))
 pg.display.set_caption("The gun of Khiryanov")
 clock = pg.time.Clock()
 score = Table()  # создание экземпляра счетчика
-labelFont = pg.font.SysFont('Comic Sans MS', 50)  # задание шрифта счетчика
+labelFont = pg.font.SysFont('Comic Sans MS', SCREEN_SIZE[1]//15)
+# задание шрифта счетчика
 
 mgr = Manager()
 
