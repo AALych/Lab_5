@@ -164,7 +164,7 @@ class Table:
 
     def draw(self):
         # Функция рисования самого счетчика
-        pg.draw.rect(screen, BLACK, (0, 0, SCREEN_SIZE[0], SCREEN_SIZE[1]/5))
+        pg.draw.rect(screen, BLACK, (0, 0, SCREEN_SIZE[0], SCREEN_SIZE[1]//5))
         counter = labelFont.render(('Ваш счёт: ' + str(self.count)),
                                    False, WHITE)
         bullets = labelFont.render(('Количество пуль: ' + str(self.bullet)),
