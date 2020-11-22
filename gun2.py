@@ -98,11 +98,15 @@ class Gun:
         self.max_pow = max_pow
         self.power = min_pow
         self.active = False
+        self.width = 30
+        self.height = 15
 
     def draw(self, screen):
         end_pos = [int(self.coord[0] + self.power * np.cos(self.angle)),
                    int(self.coord[1] + self.power * np.sin(self.angle))]
         pg.draw.line(screen, RED, self.coord, end_pos, 7)
+        pg.draw.rect(screen, RED, [self.coord[0] - self.width, self.coord[1],
+                                   self.width + 7, self.height])
 
     def strike(self):
         vel = [int(self.power * np.cos(self.angle)),
