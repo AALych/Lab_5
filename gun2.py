@@ -1,12 +1,18 @@
 import pygame as pg
 import numpy as np
-from random import randint
+from random import randint, choice
 
 SCREEN_SIZE = [800, 600]
-BLACK = (0, 0, 0)
+# Константы цветов
 RED = (255, 0, 0)
-WHITE = (245, 245, 245)
-
+BLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
+GREEN = (0, 255, 0)
+MAGENTA = (255, 0, 255)
+CYAN = (0, 255, 255)
+BLACK = (0, 0, 0)  # цвет экрана
+WHITE = (255, 255, 255)  # цвет счетчика
+COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]  # цвета мишеней
 pg.init()
 
 
@@ -114,7 +120,7 @@ class Gun:
                                 mouse_pos[0] - self.coord[0])
 
 
-class Target:
+class TargetA:
     def __init__(self, min_rad=20, max_rad=50):
         self.rad = randint(min_rad, max_rad)
         self.x = randint(2 * SCREEN_SIZE[0] // 3, SCREEN_SIZE[0] - self.rad)
@@ -136,11 +142,48 @@ class Target:
     def hit(self, obj: Ball, count: Table, min_rad=20, max_rad=50):
         if (self.x - obj.coord[0]) ** 2 + (self.y - obj.coord[1]) ** 2 <= \
                 (self.rad + obj.rad) ** 2:
-            Oof = 'Oof.mp3'
+            Oof = 'Oof.ogg'
             pg.init()
             pg.mixer.init()
             pg.mixer.music.load(Oof)
             pg.mixer.music.play(1)
+            count.increase(1)
+            self.rad = randint(min_rad, max_rad)
+            self.x = randint(2 * SCREEN_SIZE[0] // 3, SCREEN_SIZE[0] - self.rad)
+            self.y = randint(SCREEN_SIZE[1]//5 + self.rad,
+                             SCREEN_SIZE[1] - self.rad)
+
+
+class TargetB:
+    def __init__(self, min_rad=30, max_rad=50):
+        self.rad = randint(min_rad, max_rad)
+        self.x = randint(SCREEN_SIZE[0] // 3 + self.rad,
+                         SCREEN_SIZE[0] - self.rad)
+        self.y = randint(SCREEN_SIZE[1] // 5 + self.rad,
+                         SCREEN_SIZE[1] - self.rad)
+        self.color = choice(COLORS)
+        self.Vy = randint(10, 20)
+        self.Vx = randint(10, 20)
+
+    def draw(self, screen):
+        self.color = choice(COLORS)
+        pg.draw.circle(screen, self.color, [self.x, self.y], self.rad)
+
+    def move(self):
+        if SCREEN_SIZE[1]/5 + self.rad < self.y < SCREEN_SIZE[1] - self.rad:
+            self.y += self.Vy
+        else:
+            self.Vy = - self.Vy
+            self.y += self.Vy
+        if SCREEN_SIZE[0]/3 + self.rad < self.x < SCREEN_SIZE[0] - self.rad:
+            self.x += self.Vx
+        else:
+            self.Vx = - self.Vx
+            self.x += self.Vx
+
+    def hit(self, obj: Ball, count: Table, min_rad=20, max_rad=50):
+        if (self.x - obj.coord[0]) ** 2 + (self.y - obj.coord[1]) ** 2 <= \
+                (self.rad + obj.rad) ** 2:
             count.increase(1)
             self.rad = randint(min_rad, max_rad)
             self.x = randint(2 * SCREEN_SIZE[0] // 3, SCREEN_SIZE[0] - self.rad)
@@ -153,7 +196,9 @@ class Manager:
         self.gun = Gun()
         self.table = Table()
         self.balls = []
-        self.targets = [Target() for i in range(2)]
+        self.targets = [TargetA() for i in range(2)]
+        target = TargetB()
+        self.targets.append(target)
 
     def process(self, events, screen):
         done = self.handle_events(events)
